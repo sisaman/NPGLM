@@ -1,3 +1,7 @@
+#### Description:
+
+Code to accompany the paper "Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks" published in ACM Transactions on Knowledge Discovery from Data, 2019.
+
 ### Datasets:
 
 #### 1. DBLP
@@ -11,3 +15,8 @@ extract all files to features/delicious/data
 #### 3. MovieLens
 Download Link: http://files.grouplens.org/datasets/hetrec2011/hetrec2011-movielens-2k-v2.zip  
 extract all files to features/movielens/data
+
+#### Paper:
+
+Available on arXiv: 
+https://arxiv.org/pdf/1710.00818
