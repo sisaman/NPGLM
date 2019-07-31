@@ -31,5 +31,5 @@ https://arxiv.org/pdf/1710.00818
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number = {4},  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;month = jul,  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;year = {2019},  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pages = {44:1--44:31} 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pages = {44:1--44:31}  
 } 
