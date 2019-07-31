@@ -19,4 +19,21 @@ extract all files to features/movielens/data
 #### Paper:
 
 Available on arXiv: 
-https://arxiv.org/pdf/1710.00818
+https://arxiv.org/pdf/1710.00818  
+
+#### Citing:
+
+> @article{Sajadmanesh:2019:CRP:3343141.3333028,
+ author = {Sajadmanesh, Sina and Bazargani, Sogol and Zhang, Jiawei and Rabiee, Hamid R.},
+ title = {Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks},
+ journal = {ACM Transactions on Knowledge Discovery from Data},
+ volume = {13},
+ number = {4},
+ month = jul,
+ year = {2019},
+ issn = {1556-4681},
+ pages = {44:1--44:31},
+ doi = {10.1145/3333028},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
