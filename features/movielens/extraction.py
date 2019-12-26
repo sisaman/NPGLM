@@ -1,12 +1,12 @@
-import os
 import logging
-import pickle
+import os
 import random
 import threading
 from datetime import datetime
 
 import numpy as np
 from scipy import sparse
+
 from features.utils import Indexer, create_sparse, timestamp_delta_generator
 
 rating_threshold = 4
@@ -333,11 +333,11 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
                                movie_director_ds, movie_genre_ds, movie_countries_ds, feature_begin, feature_end)
     rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse, has_genre_sparse, produced_in_sparse \
         = parse_dataset(
-            user_rates_movies_ds,
-            user_tags_movies_ds, movie_actor_ds, movie_director_ds,
-            movie_genre_ds,
-            movie_countries_ds, feature_begin, feature_end, indexer
-        )
+        user_rates_movies_ds,
+        user_tags_movies_ds, movie_actor_ds, movie_director_ds,
+        movie_genre_ds,
+        movie_countries_ds, feature_begin, feature_end, indexer
+    )
     observed_samples, censored_samples = sample_generator(user_rates_movies_ds, observation_begin,
                                                           observation_end, rate_sparse, indexer)
     X, Y, T = extract_features(rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse,
@@ -346,19 +346,19 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
 
     # print(delta)
     # print(observation_end - observation_begin)
-    
+
     if not single_snapshot:
 
-        for t in range(int(feature_end - delta), int(feature_begin-1), -int(delta)):
+        for t in range(int(feature_end - delta), int(feature_begin - 1), -int(delta)):
             # print(datetime.fromtimestamp(t))
             # print(datetime.fromtimestamp(t))
             rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse, has_genre_sparse, produced_in_sparse \
                 = parse_dataset(
-                    user_rates_movies_ds,
-                    user_tags_movies_ds, movie_actor_ds, movie_director_ds,
-                    movie_genre_ds,
-                    movie_countries_ds, feature_begin, t, indexer
-                )
+                user_rates_movies_ds,
+                user_tags_movies_ds, movie_actor_ds, movie_director_ds,
+                movie_genre_ds,
+                movie_countries_ds, feature_begin, t, indexer
+            )
             X, _, _ = extract_features(rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse,
                                        has_genre_sparse, produced_in_sparse, observed_samples, censored_samples)
             X_list.append(X)

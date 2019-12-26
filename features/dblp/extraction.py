@@ -1,13 +1,14 @@
-import Stemmer
-import os
-import random
-import pickle
 import bisect
 import logging
+import os
+import random
 import threading
+
+import Stemmer
 import numpy as np
-from scipy import sparse
 from nltk.corpus import stopwords as stop_words
+from scipy import sparse
+
 from features.utils import Indexer, create_sparse
 
 path = 'th'
@@ -424,7 +425,7 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
     X, Y, T = extract_features(W, C, P, I, observed_samples, censored_samples)
     T -= observation_begin
     X_list = [X]
-    
+
     if not single_snapshot:
 
         for t in range(feature_end - delta, feature_begin - 1, -delta):
@@ -442,5 +443,5 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
 
 if __name__ == '__main__':
     # main()
-    run(1,6,12)
+    run(1, 6, 12)
     pass

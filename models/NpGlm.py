@@ -1,5 +1,5 @@
-import logging
 import numpy as np
+
 from models import Model
 from models import optimize
 
@@ -24,6 +24,7 @@ class NpGlm(Model):
 
         for i in range(max_iter):
             self.cumulative_h(X, Y)
+
             # h = self.h_estimator()
 
             def nloglf(w):
@@ -97,7 +98,7 @@ class NpGlm(Model):
         N = len(T)
         f = np.zeros((N, 1))
         for i in range(N):
-            x = X[i, ]
+            x = X[i,]
             t = T[i]
             k = np.searchsorted(self.t.ravel(), t, side='left')
             wx = self.w.dot(x)
