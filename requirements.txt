@@ -1,0 +1,6 @@
+nltk
+keras
+scikit-learn
+scipy
+numpy
+PyStemmer
