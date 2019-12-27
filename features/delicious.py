@@ -7,7 +7,7 @@ from datetime import datetime
 import numpy as np
 from scipy import sparse
 
-from features.utils import Indexer, create_sparse, timestamp_delta_generator
+from utils import Indexer, create_sparse, timestamp_delta_generator
 
 censoring_ratio = 0.5  # fraction of censored samples to all samples
 
@@ -136,7 +136,7 @@ def generate_indexer(usr_dataset, usr_bm_tg, feature_begin, feature_end):
             indexer.index('bookmark', line_items[1])
             indexer.index('tag', line_items[2])
 
-    with open('data/metadata.txt', 'w') as output:
+    with open('delicious/data/metadata.txt', 'w') as output:
         output.write('Nodes:\n')
         output.write('-----------------------------\n')
         output.write('#Users: %d\n' % indexer.indices['user'])
@@ -200,9 +200,9 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     cur_path = os.getcwd()
     os.chdir(dir_path)
-    with open('data/user_contacts-timestamps.dat') as usr_usr:
+    with open('delicious/data/user_contacts-timestamps.dat') as usr_usr:
         usr_dataset = usr_usr.read().splitlines()
-    with open('data/user_taggedbookmarks-timestamps.dat') as usr_bm_tg:
+    with open('delicious/data/user_taggedbookmarks-timestamps.dat') as usr_bm_tg:
         usr_bm_tg_dataset = usr_bm_tg.read().splitlines()
 
     delta = timestamp_delta_generator(months=delta)  # [1 2 3]
@@ -247,12 +247,12 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
             X_list.append(X)
 
     # X = np.stack(X_list[::-1], axis=1)  # X.shape = (n_samples, timesteps, n_features)
-    # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('data/dataset.pkl', 'wb'))
+    # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('delicious/data/dataset.pkl', 'wb'))
     logging.info('done.')
     os.chdir(cur_path)
     return X_list, Y, T
 
 
 if __name__ == '__main__':
-    # main()
-    pass
+    run(delta=1, observation_window=12, n_snapshots=9)
+    # pass

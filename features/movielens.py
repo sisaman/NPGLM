@@ -7,7 +7,7 @@ from datetime import datetime
 import numpy as np
 from scipy import sparse
 
-from features.utils import Indexer, create_sparse, timestamp_delta_generator
+from utils import Indexer, create_sparse, timestamp_delta_generator
 
 rating_threshold = 4
 actor_threshold = 3
@@ -64,7 +64,7 @@ def generate_indexer(user_rates_movies_ds, user_tags_movies_ds, movie_actor_ds,
             # indexer.index('movie', line_items[0])
             indexer.index('country', line_items[1])
 
-    with open('data/metadata.txt', 'w') as output:
+    with open('movielens/data/metadata.txt', 'w') as output:
         output.write('Nodes:\n')
         output.write('-----------------------------\n')
         output.write('#Users: %d\n' % indexer.indices['user'])
@@ -302,17 +302,17 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
     os.chdir(dir_path)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s', datefmt='%H:%M:%S')
 
-    with open('data/user_ratedmovies-timestamps.dat') as user_rates_movies_ds:
+    with open('movielens/data/user_ratedmovies-timestamps.dat') as user_rates_movies_ds:
         user_rates_movies_ds = user_rates_movies_ds.read().splitlines()
-    with open('data/user_taggedmovies-timestamps.dat') as user_tags_movies_ds:
+    with open('movielens/data/user_taggedmovies-timestamps.dat') as user_tags_movies_ds:
         user_tags_movies_ds = user_tags_movies_ds.read().splitlines()
-    with open('data/movie_actors.dat', encoding='latin-1') as movie_actor_ds:
+    with open('movielens/data/movie_actors.dat', encoding='latin-1') as movie_actor_ds:
         movie_actor_ds = movie_actor_ds.read().splitlines()
-    with open('data/movie_directors.dat', encoding='latin-1') as movie_director_ds:
+    with open('movielens/data/movie_directors.dat', encoding='latin-1') as movie_director_ds:
         movie_director_ds = movie_director_ds.read().splitlines()
-    with open('data/movie_genres.dat') as movie_genre_ds:
+    with open('movielens/data/movie_genres.dat') as movie_genre_ds:
         movie_genre_ds = movie_genre_ds.read().splitlines()
-    with open('data/movie_countries.dat') as movie_countries_ds:
+    with open('movielens/data/movie_countries.dat') as movie_countries_ds:
         movie_countries_ds = movie_countries_ds.read().splitlines()
 
     delta = timestamp_delta_generator(months=delta)  # [1 2 3]
@@ -364,7 +364,7 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
             X_list.append(X)
 
     # X = np.stack(X_list[::-1], axis=1)  # X.shape = (n_samples, timesteps, n_features)
-    # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('data/dataset.pkl', 'wb'))
+    # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('movielens/data/dataset.pkl', 'wb'))
     logging.info('done.')
     os.chdir(cur_path)
     return X_list, Y, T
@@ -372,4 +372,4 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
 
 if __name__ == '__main__':
     run(delta=1, observation_window=12, n_snapshots=9)
-    pass
+    # pass

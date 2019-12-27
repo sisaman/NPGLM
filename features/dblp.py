@@ -9,7 +9,7 @@ import numpy as np
 from nltk.corpus import stopwords as stop_words
 from scipy import sparse
 
-from features.utils import Indexer, create_sparse
+from utils import Indexer, create_sparse
 
 path = 'th'
 censoring_ratio = 0.5  # fraction of censored samples to all samples
@@ -55,7 +55,7 @@ def generate_papers(datafile, feature_begin, feature_end, observation_begin, obs
     logging.info('generating papers ...')
 
     # try:
-    #     result = pickle.load(open('data/papers_%s.pkl' % path, 'rb'))
+    #     result = pickle.load(open('dblp/data/papers_%s.pkl' % path, 'rb'))
     #     return result
     # except IOError:
     #     pass
@@ -137,7 +137,7 @@ def generate_papers(datafile, feature_begin, feature_end, observation_begin, obs
         p.authors = authors
         p.references = references
 
-    with open('data/metadata_%s.txt' % path, 'w') as output:
+    with open('dblp/data/metadata_%s.txt' % path, 'w') as output:
         output.write('Nodes:\n')
         output.write('-----------------------------\n')
         output.write('#Authors: %d\n' % indexer.indices['author'])
@@ -156,7 +156,7 @@ def generate_papers(datafile, feature_begin, feature_end, observation_begin, obs
         output.write('To: %s\n' % max_year)
 
     result = papers_feature_window, papers_observation_window, indexer.indices
-    # pickle.dump(result, open('data/papers_%s.pkl' % path, 'wb'))
+    # pickle.dump(result, open('dblp/data/papers_%s.pkl' % path, 'wb'))
     return result
 
 
@@ -416,7 +416,7 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
     feature_end = observation_begin
     feature_begin = feature_end - delta * n_snapshots
 
-    papers_feat_window, papers_obs_window, counter = generate_papers('data/dblp.txt', feature_begin, feature_end,
+    papers_feat_window, papers_obs_window, counter = generate_papers('dblp/data/dblp.txt', feature_begin, feature_end,
                                                                      observation_begin, observation_end,
                                                                      conf_list)
     W, C, I, P = parse_dataset(papers_feat_window, feature_begin, feature_end, counter)
@@ -435,7 +435,7 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
             X_list.append(X)
 
     # X = np.stack(X_list[::-1], axis=1)  # X.shape = (n_samples, timesteps, n_features)
-    # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('data/dataset_%s.pkl' % path, 'wb'))
+    # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('dblp/data/dataset_%s.pkl' % path, 'wb'))
     logging.info('done.')
     os.chdir(cur_path)
     return X_list, Y, T
@@ -444,4 +444,5 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
 if __name__ == '__main__':
     # main()
     run(1, 6, 12)
+    # print('success')
     pass
