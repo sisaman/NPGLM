@@ -1,6 +1,6 @@
 # Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks
 
-This repository is the official implementation of the paper [Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks](https://dl.acm.org/doi/10.1145/3333028).  
+This repository is the official implementation of the paper [Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks](https://dl.acm.org/doi/10.1145/3333028), published in ACM Transactions on Knowledge Discovery from Data (TKDD), Auguest, 2019.
 
 ## Datasets:
 
