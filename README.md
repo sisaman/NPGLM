@@ -1,8 +1,8 @@
-#### Description:
+# Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks
 
-Code to accompany the paper "Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks" published in ACM Transactions on Knowledge Discovery from Data, 2019.
+This repository is the official implementation of the paper [Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks](https://dl.acm.org/doi/10.1145/3333028).  
 
-### Datasets:
+## Datasets:
 
 #### 1. DBLP
 Download Link: https://static.aminer.org/lab-datasets/citation/dblp.v8.tgz  
@@ -21,15 +21,21 @@ extract all files to features/movielens/data
 Available on arXiv: 
 https://arxiv.org/pdf/1710.00818  
 
-#### Citing:
-
-> @article{sajadmaneshtkdd19,  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;author = {Sajadmanesh, Sina and Bazargani, Sogol and Zhang, Jiawei and Rabiee, Hamid R.},  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title = {Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks},  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;journal = {ACM Transactions on Knowledge Discovery from Data},  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;volume = {13},  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number = {4},  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;month = jul,  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;year = {2019},  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pages = {44:1--44:31}  
-} 
+## Citation:
+If you find this code useful, please cite the following paper:  
+```
+@article{10.1145/3333028,
+    author = {Sajadmanesh, Sina and Bazargani, Sogol and Zhang, Jiawei and Rabiee, Hamid R.},
+    title = {Continuous-Time Relationship Prediction in Dynamic Heterogeneous Information Networks},
+    year = {2019},
+    issue_date = {August 2019},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {13},
+    number = {4},
+    issn = {1556-4681},
+    journal = {ACM Trans. Knowl. Discov. Data},
+    month = jul,
+    articleno = {44},
+}
+```
