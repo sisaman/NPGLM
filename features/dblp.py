@@ -138,7 +138,7 @@ def generate_papers(datafile, feature_begin, feature_end, observation_begin, obs
         p.authors = authors
         p.references = references
 
-    with open('dblp/data/metadata_%s.txt' % path, 'w') as output:
+    with open('data/dblp/metadata_%s.txt' % path, 'w') as output:
         output.write('Nodes:\n')
         output.write('-----------------------------\n')
         output.write('#Authors: %d\n' % indexer.indices['author'])
@@ -417,7 +417,7 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
     feature_end = observation_begin
     feature_begin = feature_end - delta * n_snapshots
 
-    papers_feat_window, papers_obs_window, counter = generate_papers('dblp/data/dblp.txt', feature_begin, feature_end,
+    papers_feat_window, papers_obs_window, counter = generate_papers('data/dblp/dblp.txt', feature_begin, feature_end,
                                                                      observation_begin, observation_end,
                                                                      conf_list)
     W, C, I, P = parse_dataset(papers_feat_window, feature_begin, feature_end, counter)

@@ -134,7 +134,7 @@ def generate_indexer(usr_dataset, usr_bm_tg, feature_begin, feature_end):
             indexer.index('bookmark', line_items[1])
             indexer.index('tag', line_items[2])
 
-    with open('delicious/data/metadata.txt', 'w') as output:
+    with open('data/delicious/metadata.txt', 'w') as output:
         output.write('Nodes:\n')
         output.write('-----------------------------\n')
         output.write('#Users: %d\n' % indexer.indices['user'])
@@ -198,9 +198,9 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
     dir_path = os.path.dirname(os.path.realpath(__file__))
     cur_path = os.getcwd()
     os.chdir(dir_path)
-    with open('delicious/data/user_contacts-timestamps.dat') as usr_usr:
+    with open('data/delicious/user_contacts-timestamps.dat') as usr_usr:
         usr_dataset = usr_usr.read().splitlines()
-    with open('delicious/data/user_taggedbookmarks-timestamps.dat') as usr_bm_tg:
+    with open('data/delicious/user_taggedbookmarks-timestamps.dat') as usr_bm_tg:
         usr_bm_tg_dataset = usr_bm_tg.read().splitlines()
 
     delta = timestamp_delta_generator(months=delta)  # [1 2 3]
