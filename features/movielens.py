@@ -296,9 +296,6 @@ def extract_features(rate_sparse, attach_sparse, played_by_sparse, directed_by_s
 
 
 def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snapshot=False):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    cur_path = os.getcwd()
-    os.chdir(dir_path)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s', datefmt='%H:%M:%S')
 
     with open('data/movielens/user_ratedmovies-timestamps.dat') as user_rates_movies_ds:
@@ -365,7 +362,6 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
     # X = np.stack(X_list[::-1], axis=1)  # X.shape = (n_samples, timesteps, n_features)
     # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('data/movielensset.pkl', 'wb'))
     logging.info('done.')
-    os.chdir(cur_path)
     return X_list, Y, T
 
 

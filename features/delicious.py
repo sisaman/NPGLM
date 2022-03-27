@@ -195,9 +195,7 @@ def parse_dataset(usr_dataset, usr_bm_tg, feature_begin, feature_end, indexer):
 
 def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snapshot=False):
     logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s', datefmt='%H:%M:%S')
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    cur_path = os.getcwd()
-    os.chdir(dir_path)
+    
     with open('data/delicious/user_contacts-timestamps.dat') as usr_usr:
         usr_dataset = usr_usr.read().splitlines()
     with open('data/delicious/user_taggedbookmarks-timestamps.dat') as usr_bm_tg:
@@ -247,7 +245,6 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
     # X = np.stack(X_list[::-1], axis=1)  # X.shape = (n_samples, timesteps, n_features)
     # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('delicious/data/dataset.pkl', 'wb'))
     logging.info('done.')
-    os.chdir(cur_path)
     return X_list, Y, T
 
 
