@@ -9,10 +9,6 @@ class NpGlm(Model):
         super().__init__()
         self.t = None
         self.H = None
-        self.conv = None
-
-    def enable_trace(self):
-        self.conv = []
 
     def fit(self, X, Y, T):  # X,Y, and T must be sorted by T beforehand
         self.t = T
