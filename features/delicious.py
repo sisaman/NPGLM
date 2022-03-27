@@ -7,9 +7,7 @@ from datetime import datetime
 import numpy as np
 from scipy import sparse
 
-from utils import Indexer, create_sparse, timestamp_delta_generator
-
-censoring_ratio = 0.5  # fraction of censored samples to all samples
+from .utils import Indexer, create_sparse, timestamp_delta_generator
 
 
 def extract_features(contact_sparse, save_sparse, attach_sparse, observed_samples, censored_samples):
@@ -76,7 +74,7 @@ def extract_features(contact_sparse, save_sparse, attach_sparse, observed_sample
     return np.array(X), np.array(Y), np.array(T)
 
 
-def sample_generator(usr_dataset, observation_begin, observation_end, contact_sparse, indexer):
+def sample_generator(usr_dataset, observation_begin, observation_end, contact_sparse, indexer, censoring_ratio):
     logging.info('generating samples ...')
     U_U = contact_sparse.dot(contact_sparse.T)
     observed_samples = {}
@@ -195,7 +193,7 @@ def parse_dataset(usr_dataset, usr_bm_tg, feature_begin, feature_end, indexer):
     return contact_sparse, save_sparse, attach_sparse
 
 
-def run(delta, observation_window, n_snapshots, single_snapshot=False):
+def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snapshot=False):
     logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s', datefmt='%H:%M:%S')
     dir_path = os.path.dirname(os.path.realpath(__file__))
     cur_path = os.getcwd()
@@ -231,7 +229,7 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
     # in this method we would like to extract the target relationships that have been
     # generated in the observation window and after observation_end_time e.g. censored sample
     observed_samples, censored_samples = sample_generator(usr_dataset, observation_begin, observation_end,
-                                                          contact_sparse, indexer)
+                                                          contact_sparse, indexer, censoring_ratio)
 
     X, Y, T = extract_features(contact_sparse, save_sparse, attach_sparse, observed_samples, censored_samples)
     X_list = [X]

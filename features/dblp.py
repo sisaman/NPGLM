@@ -6,13 +6,14 @@ import threading
 
 import Stemmer
 import numpy as np
+import nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords as stop_words
 from scipy import sparse
 
-from utils import Indexer, create_sparse
+from .utils import Indexer, create_sparse
 
 path = 'th'
-censoring_ratio = 0.5  # fraction of censored samples to all samples
 paper_threshold = 5
 
 stopwords = stop_words.words('english')
@@ -339,7 +340,7 @@ def extract_features(W, C, P, I, observed_samples, censored_samples):
     return np.array(X), np.array(Y), np.array(T)
 
 
-def generate_samples(papers_observation_window, W, C):
+def generate_samples(papers_observation_window, censoring_ratio, W, C):
     logging.info('generating samples ...')
     written_by = {}
     elements = sparse.find(W)
@@ -388,7 +389,7 @@ def generate_samples(papers_observation_window, W, C):
     return observed_samples, censored_samples
 
 
-def run(delta, observation_window, n_snapshots, single_snapshot=False):
+def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snapshot=False):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     cur_path = os.getcwd()
     os.chdir(dir_path)
@@ -420,7 +421,7 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
                                                                      observation_begin, observation_end,
                                                                      conf_list)
     W, C, I, P = parse_dataset(papers_feat_window, feature_begin, feature_end, counter)
-    observed_samples, censored_samples = generate_samples(papers_obs_window, W, C)
+    observed_samples, censored_samples = generate_samples(papers_obs_window, censoring_ratio, W, C)
 
     X, Y, T = extract_features(W, C, P, I, observed_samples, censored_samples)
     T -= observation_begin

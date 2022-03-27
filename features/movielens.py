@@ -7,11 +7,10 @@ from datetime import datetime
 import numpy as np
 from scipy import sparse
 
-from utils import Indexer, create_sparse, timestamp_delta_generator
+from .utils import Indexer, create_sparse, timestamp_delta_generator
 
 rating_threshold = 4
 actor_threshold = 3
-censoring_ratio = 0.5  # fraction of censored samples to all samples
 
 
 def generate_indexer(user_rates_movies_ds, user_tags_movies_ds, movie_actor_ds,
@@ -177,7 +176,7 @@ def parse_dataset(user_rates_movies_ds,
     # assign_sparse
 
 
-def sample_generator(usr_rates_movies_ds, observation_begin, observation_end, rate_sparse, indexer):
+def sample_generator(usr_rates_movies_ds, observation_begin, observation_end, rate_sparse, indexer, censoring_ratio):
     logging.info('generating samples ...')
     U_M = rate_sparse
     observed_samples = {}
@@ -296,7 +295,7 @@ def extract_features(rate_sparse, attach_sparse, played_by_sparse, directed_by_s
     return np.array(X), np.array(Y), np.array(T)
 
 
-def run(delta, observation_window, n_snapshots, single_snapshot=False):
+def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snapshot=False):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     cur_path = os.getcwd()
     os.chdir(dir_path)
@@ -339,7 +338,7 @@ def run(delta, observation_window, n_snapshots, single_snapshot=False):
         movie_countries_ds, feature_begin, feature_end, indexer
     )
     observed_samples, censored_samples = sample_generator(user_rates_movies_ds, observation_begin,
-                                                          observation_end, rate_sparse, indexer)
+                                                          observation_end, rate_sparse, indexer, censoring_ratio)
     X, Y, T = extract_features(rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse,
                                has_genre_sparse, produced_in_sparse, observed_samples, censored_samples)
     X_list = [X]
