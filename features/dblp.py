@@ -407,7 +407,6 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
     observed_samples, censored_samples = generate_samples(papers_obs_window, censoring_ratio, W, C)
 
     X, Y, T = extract_features(W, C, P, I, observed_samples, censored_samples)
-    T -= observation_begin
     X_list = [X]
 
     if not single_snapshot:
@@ -425,4 +424,5 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
         scaler.fit_transform(X)
         
     X = np.stack(X_list, axis=1)  # X.shape = (n_samples, timesteps, n_features)
+    T = T - observation_begin #+ np.random.rand(*T.shape)
     return X, Y, T

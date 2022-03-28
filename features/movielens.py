@@ -341,4 +341,5 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
         scaler.fit_transform(X)
 
     X = np.stack(X_list, axis=1)  # X.shape = (n_samples, timesteps, n_features)
+    T /= delta
     return X, Y, T
