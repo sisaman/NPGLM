@@ -22,10 +22,10 @@ def augment(X: np.ndarray):
     return np.append(v, X, axis=1)
 
 
-def optimize(nloglf, p0):
-    def hes(w): return nloglf(w)[2]
+def optimize(loss_fn, p0):
+    def hes(w): return loss_fn(w)[2]
 
-    result = minimize(nloglf, p0, method='trust-ncg', jac=True, hess=hes)
+    result = minimize(loss_fn, p0, method='trust-ncg', jac=True, hess=hes)
     return result.x, result.fun
 
 
