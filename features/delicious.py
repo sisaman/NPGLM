@@ -1,11 +1,11 @@
 import logging
-import os
 import random
 import threading
 from datetime import datetime
 
 import numpy as np
 from scipy import sparse
+from sklearn.preprocessing import MinMaxScaler
 
 from .utils import Indexer, create_sparse, timestamp_delta_generator
 
@@ -88,8 +88,6 @@ def sample_generator(usr_dataset, observation_begin, observation_end, contact_sp
             if not (u is None or v is None):
                 observed_samples[u, v] = contact_timestamp - observation_begin
 
-    # logging.info('Observed samples found.')
-
     nonzero = sparse.find(U_U)
     set_observed = set([(u, v) for (u, v) in observed_samples] + [(u, v) for (u, v) in zip(nonzero[0], nonzero[1])])
     censored_samples = {}
@@ -105,8 +103,6 @@ def sample_generator(usr_dataset, observation_begin, observation_end, contact_sp
             v = user_list[j]
             if (u, v) not in set_observed:
                 censored_samples[u, v] = observation_end - observation_begin + 1
-
-    # print(len(observed_samples) + len(censored_samples))
 
     return observed_samples, censored_samples
 
@@ -201,24 +197,16 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
     with open('data/delicious/user_taggedbookmarks-timestamps.dat') as usr_bm_tg:
         usr_bm_tg_dataset = usr_bm_tg.read().splitlines()
 
-    delta = timestamp_delta_generator(months=delta)  # [1 2 3]
-    # observation_window = 24  # [12 18 24]
-    # n_snapshots = 15  # [9 12 15]
+    delta = timestamp_delta_generator(months=delta)
 
     observation_end = datetime(2010, 10, 1).timestamp()
     observation_begin = observation_end - timestamp_delta_generator(months=observation_window)
     feature_end = observation_begin
     feature_begin = feature_end - n_snapshots * delta
 
-    # feature_begin = datetime(2009, 2, 1).timestamp()
-    # feature_end = datetime(2009, 7, 1).timestamp()
-    # observation_begin = datetime(2009, 7, 1).timestamp()
-    # observation_end = datetime(2010, 1, 1).timestamp()
-
     # first we need to parse the whole data set to capture all of the entities and assign indexes to them
     indexer = generate_indexer(usr_dataset, usr_bm_tg_dataset, feature_begin, feature_end)
 
-    # print(datetime.fromtimestamp(feature_end))
     # in this method we parse our dataset in the feature extraction window, and generate
     # the sparse matrices dedicated to each link
     contact_sparse, save_sparse, attach_sparse = parse_dataset(usr_dataset, usr_bm_tg_dataset,
@@ -232,22 +220,20 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
     X, Y, T = extract_features(contact_sparse, save_sparse, attach_sparse, observed_samples, censored_samples)
     X_list = [X]
 
-    # print(delta)
-    # print(observation_end - observation_begin)
+    
     if not single_snapshot:
-        for t in range(int(feature_end - delta), int(feature_begin - 1), -int(delta)):
-            # print(datetime.fromtimestamp(t))
+        for t in range(int(feature_end - delta), int(feature_begin), -int(delta)):
             contact_sparse, save_sparse, attach_sparse = parse_dataset(
                 usr_dataset, usr_bm_tg_dataset, feature_begin, t, indexer)
             X, _, _ = extract_features(contact_sparse, save_sparse, attach_sparse, observed_samples, censored_samples)
-            X_list.append(X)
+            X_list = [X] + X_list
 
-    # X = np.stack(X_list[::-1], axis=1)  # X.shape = (n_samples, timesteps, n_features)
-    # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('delicious/data/dataset.pkl', 'wb'))
-    logging.info('done.')
-    return X_list, Y, T
+        for i in range(1, len(X_list)):
+            X_list[i] -= X_list[i - 1]
 
+    scaler = MinMaxScaler(copy=False)
+    for X in X_list:
+        scaler.fit_transform(X)
 
-if __name__ == '__main__':
-    run(delta=1, observation_window=12, n_snapshots=9)
-    # pass
+    X = np.stack(X_list, axis=1)  # X.shape = (n_samples, timesteps, n_features)
+    return X, Y, T

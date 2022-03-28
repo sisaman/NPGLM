@@ -1,11 +1,11 @@
 import logging
-import os
 import random
 import threading
 from datetime import datetime
 
 import numpy as np
 from scipy import sparse
+from sklearn.preprocessing import MinMaxScaler
 
 from .utils import Indexer, create_sparse, timestamp_delta_generator
 
@@ -42,25 +42,21 @@ def generate_indexer(user_rates_movies_ds, user_tags_movies_ds, movie_actor_ds,
         line_items = line.split('\t')
         ranking = int(line_items[3])
         if ranking < actor_threshold and line_items[0] in indexer.mapping['movie']:
-            # indexer.index('movie', line_items[0])
             indexer.index('actor', line_items[1])
 
     for line in movie_director_ds[1:]:
         line_items = line.split('\t')
         if line_items[0] in indexer.mapping['movie']:
-            # indexer.index('movie', line_items[0])
             indexer.index('director', line_items[1])
 
     for line in movie_genre_ds[1:]:
         line_items = line.split('\t')
         if line_items[0] in indexer.mapping['movie']:
-            # indexer.index('movie', line_items[0])
             indexer.index('genre', line_items[1])
 
     for line in movie_countries_ds[1:]:
         line_items = line.split('\t')
         if line_items[0] in indexer.mapping['movie']:
-            # indexer.index('movie', line_items[0])
             indexer.index('country', line_items[1])
 
     with open('data/movielens/metadata.txt', 'w') as output:
@@ -94,7 +90,6 @@ def parse_dataset(user_rates_movies_ds,
                   movie_countries_ds, feature_begin, feature_end, indexer):
     logging.info('parsing dataset ...')
     rate = []
-    # assign = []
     attach = []
     played_by = []
     directed_by = []
@@ -120,10 +115,8 @@ def parse_dataset(user_rates_movies_ds,
         line_items = line.split('\t')
         assign_time = float(line_items[3]) / 1000
         if feature_begin < assign_time <= feature_end:
-            # user = indexer.get_index('user', line_items[0])
             movie = indexer.get_index('movie', line_items[1])
             tag = indexer.get_index('tag', line_items[2])
-            # assign.append((user, tag))
             attach.append((tag, movie))
 
     for line in movie_actor_ds[1:]:
@@ -165,7 +158,6 @@ def parse_dataset(user_rates_movies_ds,
     num_countries = indexer.indices['country']
 
     rate_sparse = create_sparse(rate, num_usr, num_movie)
-    # assign_sparse = create_sparse(assign, num_usr, num_tag)
     attach_sparse = create_sparse(attach, num_tag, num_movie)
     played_by_sparse = create_sparse(played_by, num_movie, num_actor)
     directed_by_sparse = create_sparse(directed_by, num_movie, num_directors)
@@ -173,7 +165,6 @@ def parse_dataset(user_rates_movies_ds,
     produced_in_sparse = create_sparse(produced_in, num_movie, num_countries)
 
     return rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse, has_genre_sparse, produced_in_sparse
-    # assign_sparse
 
 
 def sample_generator(usr_rates_movies_ds, observation_begin, observation_end, rate_sparse, indexer, censoring_ratio):
@@ -190,8 +181,6 @@ def sample_generator(usr_rates_movies_ds, observation_begin, observation_end, ra
             v = indexer.get_index('movie', line_items[1])
             if not (u is None or v is None):
                 observed_samples[u, v] = rating_timestamp - observation_begin
-
-    # logging.info('Observed samples found.')
 
     nonzero = sparse.find(U_M)
     set_observed = set([(u, v) for (u, v) in observed_samples] + [(u, v) for (u, v) in zip(nonzero[0], nonzero[1])])
@@ -210,7 +199,6 @@ def sample_generator(usr_rates_movies_ds, observation_begin, observation_end, ra
             if (u, v) not in set_observed:
                 censored_samples[u, v] = observation_end - observation_begin + 1
 
-    # print(len(observed_samples) + len(censored_samples))
     return observed_samples, censored_samples
 
 
@@ -311,24 +299,16 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
     with open('data/movielens/movie_countries.dat') as movie_countries_ds:
         movie_countries_ds = movie_countries_ds.read().splitlines()
 
-    delta = timestamp_delta_generator(months=delta)  # [1 2 3]
-    # observation_window = 24  # [12 18 24]
-    # n_snapshots = 15  # [9 12 15]
+    delta = timestamp_delta_generator(months=delta)
 
     observation_end = datetime(2009, 1, 1).timestamp()
     observation_begin = observation_end - timestamp_delta_generator(months=observation_window)
     feature_end = observation_begin
     feature_begin = feature_end - n_snapshots * delta
 
-    # feature_begin = datetime(2006, 1, 1).timestamp()
-    # feature_end = datetime(2008, 1, 1).timestamp()
-    # observation_begin = datetime(2008, 1, 1).timestamp()
-    # observation_end = datetime(2009, 1, 1).timestamp()
-
     indexer = generate_indexer(user_rates_movies_ds, user_tags_movies_ds, movie_actor_ds,
                                movie_director_ds, movie_genre_ds, movie_countries_ds, feature_begin, feature_end)
-    rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse, has_genre_sparse, produced_in_sparse \
-        = parse_dataset(
+    rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse, has_genre_sparse, produced_in_sparse = parse_dataset(
         user_rates_movies_ds,
         user_tags_movies_ds, movie_actor_ds, movie_director_ds,
         movie_genre_ds,
@@ -340,16 +320,10 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
                                has_genre_sparse, produced_in_sparse, observed_samples, censored_samples)
     X_list = [X]
 
-    # print(delta)
-    # print(observation_end - observation_begin)
-
     if not single_snapshot:
 
-        for t in range(int(feature_end - delta), int(feature_begin - 1), -int(delta)):
-            # print(datetime.fromtimestamp(t))
-            # print(datetime.fromtimestamp(t))
-            rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse, has_genre_sparse, produced_in_sparse \
-                = parse_dataset(
+        for t in range(int(feature_end - delta), int(feature_begin), -int(delta)):
+            rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse, has_genre_sparse, produced_in_sparse = parse_dataset(
                 user_rates_movies_ds,
                 user_tags_movies_ds, movie_actor_ds, movie_director_ds,
                 movie_genre_ds,
@@ -357,14 +331,14 @@ def run(delta, observation_window, n_snapshots, censoring_ratio=0.5, single_snap
             )
             X, _, _ = extract_features(rate_sparse, attach_sparse, played_by_sparse, directed_by_sparse,
                                        has_genre_sparse, produced_in_sparse, observed_samples, censored_samples)
-            X_list.append(X)
+            X_list = [X] + X_list
 
-    # X = np.stack(X_list[::-1], axis=1)  # X.shape = (n_samples, timesteps, n_features)
-    # pickle.dump({'X': X_list[::-1], 'Y': Y, 'T': T}, open('data/movielensset.pkl', 'wb'))
-    logging.info('done.')
-    return X_list, Y, T
+        for i in range(1, len(X_list)):
+            X_list[i] -= X_list[i - 1]
 
+    scaler = MinMaxScaler(copy=False)
+    for X in X_list:
+        scaler.fit_transform(X)
 
-if __name__ == '__main__':
-    run(delta=1, observation_window=12, n_snapshots=9)
-    # pass
+    X = np.stack(X_list, axis=1)  # X.shape = (n_samples, timesteps, n_features)
+    return X, Y, T
