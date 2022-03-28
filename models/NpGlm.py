@@ -1,4 +1,6 @@
+import logging
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 from models import Model
 from models import optimize
@@ -11,22 +13,25 @@ class NpGlm(Model):
         self.H = None
 
     def fit(self, X, Y, T, max_iter=2000):
-        # X,Y, and T must be sorted by T beforehand
+
+        X, X_val, Y, Y_val, T, T_val = train_test_split(X, Y, T, test_size=0.1, stratify=Y)
+        
+        idx = np.argsort(T)
+        X = X[idx]
+        Y = Y[idx]
+        T = T[idx]
 
         self.t = T
         d = X.shape[1]
         self.w = np.zeros((d, 1))
         f_old = np.inf
+        loss_fn = lambda w: self.loss(w, X, Y, self.H)
 
         for i in range(max_iter):
-            self.cumulative_h(X, Y)
+            self.H = self.cumulative_h(X, Y)
+            self.w, self.f = optimize(loss_fn, self.w)
 
-            def nloglf(w):
-                return NpGlm.nlogl(w, None, self.H, X, Y, T)
-
-            self.w, self.f = optimize(nloglf, self.w)
-
-            # logging.info('%d\t%f' % (i, self.f / len(T)))
+            print(f'Iteration {i}: \t train loss: {self.f / len(T):.4f} \t val error: {self.evaluate(X_val, Y_val, T_val):.4f}')
 
             if abs(self.f - f_old) < 1e-3:
                 break
@@ -37,14 +42,7 @@ class NpGlm(Model):
         E = np.exp(X.dot(self.w))
         cumexp = np.cumsum(E[::-1])[::-1]
         frac = Y / cumexp
-        self.H = np.cumsum(frac)
-
-    def h_estimator(self):
-        H = np.append(0, self.H)
-        T = np.append(0, self.t)
-        h = np.diff(H) / np.diff(T)
-        h[np.isnan(h)] = 0
-        return h
+        return np.cumsum(frac)
 
     def mean(self, X):
         E = np.exp(X.dot(self.w))
@@ -70,45 +68,21 @@ class NpGlm(Model):
 
         return T
 
-    def get_error(self, w, dist):
-        w = w[1:].T
-        if dist == 'ray':
-            w = 2 * w
-
-        res = np.abs(w - self.w)
-        return np.mean(res)
-
-    def log_likelihood(self, X, Y, T):
-        H = np.interp(T.ravel(), self.t.ravel(), self.H)
-        Ha = np.insert(H, 0, 0)
-        Ta = np.insert(T, 0, 0)
-        h = np.diff(Ha) / np.diff(Ta)
-        return -NpGlm.nlogl(self.w, h, H, X, Y, T)[0] / len(T)
-
-    def pdf(self, X, T):
-        h = self.h_estimator()
-        N = len(T)
-        f = np.zeros((N, 1))
-        for i in range(N):
-            x = X[i,]
-            t = T[i]
-            k = np.searchsorted(self.t.ravel(), t, side='left')
-            wx = self.w.dot(x)
-            f[i] = np.exp(wx) * h[k] * np.exp(-self.H[k] * np.exp(wx))
-        return f
+    def evaluate(self, X, Y, T):
+        T_pred = self.quantile(X, q=0.5)
+        MAE = np.mean(np.abs(T_pred[Y] - T[Y]))
+        return MAE
 
     @staticmethod
-    def nlogl(w, h, H, X, Y, T):
+    def loss(w, X, Y, H):
         """
         negative log likelihood (complete)
         refer to formulations of NP-GLM
         """
-        # h[h == 0] = 1e-20
         Xw = np.dot(X, w)
         E = np.exp(Xw)
         HE = H * E
         p = X * (HE - Y)[:, None]
-        # f = np.sum(HE - Y * (Xw + np.log(h)), axis=0)
         f = np.sum(HE - Y * Xw, axis=0)
         g = np.sum(p, axis=0)
         h = np.dot(X.T, (X * HE[:, None]))
